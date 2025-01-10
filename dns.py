@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from dns_student.dns_tools import *
-import dataclasses, struct, random, socket
+import dataclasses, struct, random, socket, argparse
 random.seed(1)
 
 TYPE_A = 1
@@ -48,15 +48,26 @@ def build_query(domain_nane, record_type):
 
     return header_to_bytes(header) + question_to_bytes(question)
 
-def main(type, name, server):
+def main():
     dns_tool = DNS()
 
-    query = build_query('www.example.com', 1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--type", default="A", type=str)
+    parser.add_argument("--name", default="www.ufba.br", type=str)
+    parser.add_argument("--server", default="8.8.8.8", type=str)
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(query, ("8.8.8.8", 53))
+    args = parser.parse_args()
+
+    query = build_query(args.name, 1)
+
+    if args.type == "A":
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    elif args.type == "AAAA":
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+
+    sock.sendto(query, (args.server, 53))
     response, _ = sock.recvfrom(1024)
-    
+
     return dns_tool.decode_dns(response)
 
 
@@ -65,4 +76,4 @@ if __name__ == "__main__":
     name = ""
     server = ""
     
-    main(type, name, server)
+    main()
