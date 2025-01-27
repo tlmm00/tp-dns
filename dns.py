@@ -49,15 +49,6 @@ def build_query(domain_nane, record_type):
 
     return header_to_bytes(header) + question_to_bytes(question)
 
-def find_paragraph_with_string(text, search_string):
-    paragraphs = text.split("\n\n")
-    matching_paragraphs = [
-        paragraph for paragraph in paragraphs
-        if search_string.lower() in paragraph.lower()
-    ]
-    
-    return matching_paragraphs
-
 def main():
     dns_tool = DNS()
 
